@@ -1,0 +1,19 @@
+<template>
+  <router-view/>
+</template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "App"
+});
+</script>
+
+<style>
+#app {
+    font-family: Georgia, Arial, sans-serif;
+    margin-left: 40px;
+    margin-right: 40px;
+}
+</style>
