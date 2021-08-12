@@ -1,11 +1,12 @@
 <template>
   <Header />
 
-  <div v-if="article !== null" class="grid-container">
+  <div v-if="article" class="grid-container">
     <div>
       <h1 id="title">{{ article.title }}</h1>
       <p id="subtitle">
-        本文由 {{ article.author.username }} 发布于 {{ formatted_time(article.created) }}
+        本文由 {{ article.author.username }} 发布于
+        {{ formatted_time(article.created) }}
       </p>
       <div v-html="article.body_html" class="article-body"></div>
     </div>
@@ -22,13 +23,16 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import axios from "axios";
-import Header from "../components/BlogHeader.vue"
-import Footer from "../components/BlogFooter.vue"
+//import { getArticleDetail } from "../api/Api";
+// import { IArticleDetailResponse } from "../api/Response";
+import Header from "../components/BlogHeader.vue";
+import Footer from "../components/BlogFooter.vue";
+
 export default defineComponent({
   name: "ArticleDetail",
   components: {
     Header,
-    Footer
+    Footer,
   },
   data() {
     return {
@@ -36,38 +40,35 @@ export default defineComponent({
     }
   },
   mounted() {
-    axios.get('/api/article/' + this.$route.params.id).then(
-      response => {
-        console.log(response);
-        this.article = response.data
-      }
-    );
+    axios.get("/api/article/" + this.$route.params.id).then((response) => {
+      console.log(response);
+      this.article = response.data
+    });
   },
   methods: {
     formatted_time: (iso_date_string: string): string => {
-        const date = new Date(iso_date_string);
-        return date.toLocaleDateString();
-    }
+      const date = new Date(iso_date_string);
+      return date.toLocaleDateString();}
   }
 });
 </script>
 
 <style scoped>
 .grid-container {
-    display: grid;
-    grid-template-columns: 3fr 1fr;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
 }
 
 
 #title {
-    text-align: center;
-    font-size: x-large;
+  text-align: center;
+  font-size: x-large;
 }
 
 #subtitle {
-    text-align: center;
-    color: gray;
-    font-size: small;
+  text-align: center;
+  color: gray;
+  font-size: small;
 }
 </style>
 
