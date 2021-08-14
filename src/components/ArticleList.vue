@@ -1,46 +1,56 @@
 <template>
-  <div v-for="article in articles" :key="article.url" id="articles">
+  <div id="wrapper">
     <div>
-      <span v-for="tag in article.tags" :key="tag" class="tag">
-        {{ tag }}
-      </span>
+      <div class="container">
+        <div
+          v-for="article in articles"
+          :key="article.url"
+          id="articles"
+          class="row"
+          >
+          <router-link
+            :to="{ name: 'ArticleDetail', params: { id: article.id } }"
+            class="article-title font-title padding-lr-20"
+            style="font-size: 18px"
+          >
+            {{ article.title }}
+          </router-link>
+          <div class="row">
+            <p class="font-size-xs, padding-lr-20">
+              {{ formattedTime(article.created) }}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-    <router-link
-      :to="{ name: 'ArticleDetail', params: { id: article.id } }"
-      class="article-title"
-    >
-      {{ article.title }}
-    </router-link>
-    <div>{{ formattedTime(article.created) }}</div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { getArticleList } from "../api/Api";
-
-let articles: any = [];
+import { computed, defineComponent, onMounted } from "vue"
+import { useStore } from 'vuex'
+import { GlobalDataProps } from '../store'
 
 export default defineComponent({
   name: "ArticleList",
-  data() {
-    return {
-      articles: articles,
+  setup() {
+    const store = useStore<GlobalDataProps>()
+    onMounted(() => {
+      store.dispatch('fetchArticleList')
+    })
+    const articles = computed(() => {
+      return store.state.articleList
+    })
+
+    const formattedTime = (dateString: string) => {
+      const date = new Date(dateString)
+      return date.toLocaleDateString()
     }
-  },
-  methods: {
-    formattedTime: (dateString: string): string => {
-      const date = new Date(dateString);
-      return date.toLocaleDateString();
-    },
-  },
-  async mounted() {
-    this.articles = await getArticleList({ url: "/api/article/" });
-    console.log(this.articles)
-    // axios.get("/api/article").then((response) => {
-    //   console.log(response.data);
-    //   this.articles = response.data;
-    // });
+
+    return {
+      articles,
+      formattedTime
+    }
   }
 })
 </script>

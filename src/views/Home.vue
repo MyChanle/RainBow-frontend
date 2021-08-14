@@ -1,22 +1,23 @@
 <template>
-  <Header />
-  
-  <ArticleList />
+  <HomeHeader />
+
+  <article-list />
 
   <Footer />
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from "vue"
 import ArticleList from "../components/ArticleList.vue"
-import Header from "../components/BlogHeader.vue"
+import HomeHeader from '../components/HomeHeader.vue'
 import Footer from "../components/BlogFooter.vue"
+
 export default defineComponent({
   name: "Home",
   components: {
-    Header,
+    HomeHeader,
     ArticleList,
-    Footer,
+    Footer
   }
 })
 </script>
