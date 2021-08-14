@@ -1,12 +1,12 @@
 <template>
-  <Header />
+  <Header :user="currentUser"/>
 
   <div v-if="article" class="grid-container">
     <div>
       <h1 id="title">{{ article.title }}</h1>
       <p id="subtitle">
-        本文由 {{ article.author.username }} 发布于
-        {{ formatted_time(article.created) }}
+        本文由 {{ article.author && article.author.username }} 发布于
+        {{ formattedTime(article.created) }}
       </p>
       <div v-html="article.body_html" class="article-body"></div>
     </div>
@@ -21,36 +21,46 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import axios from "axios";
-//import { getArticleDetail } from "../api/Api";
-// import { IArticleDetailResponse } from "../api/Response";
-import Header from "../components/BlogHeader.vue";
-import Footer from "../components/BlogFooter.vue";
+import { computed, defineComponent, onMounted } from "vue"
+import { useStore } from 'vuex'
+import { useRoute } from "vue-router"
+import Header from "../components/BlogHeader.vue"
+import Footer from "../components/BlogFooter.vue"
+import { GlobalDataProps } from "@/store"
 
 export default defineComponent({
   name: "ArticleDetail",
   components: {
     Header,
-    Footer,
+    Footer
   },
-  data() {
-    return {
-      article: null
+  setup() {
+    const store = useStore<GlobalDataProps>()
+    const route = useRoute()
+    const currentId = route.params.id
+    onMounted(() => {
+      store.dispatch('fetchArticleDetail', currentId)
+    })
+
+    const article = computed(() => {
+      return store.state.article
+    })
+    const currentUser = computed(() => {
+      return store.state.user
+    })
+
+    const formattedTime = (dateString: string) => {
+      const date = new Date(dateString)
+      return date.toLocaleDateString()
     }
-  },
-  mounted() {
-    axios.get("/api/article/" + this.$route.params.id).then((response) => {
-      console.log(response);
-      this.article = response.data
-    });
-  },
-  methods: {
-    formatted_time: (iso_date_string: string): string => {
-      const date = new Date(iso_date_string);
-      return date.toLocaleDateString();}
+
+    return {
+      article,
+      currentUser,
+      formattedTime
+    }
   }
-});
+})
 </script>
 
 <style scoped>
@@ -58,7 +68,6 @@ export default defineComponent({
   display: grid;
   grid-template-columns: 3fr 1fr;
 }
-
 
 #title {
   text-align: center;
