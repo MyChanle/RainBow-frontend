@@ -30,42 +30,49 @@ interface Avatar {
   url: string;
 }
 
-export interface ArticleListProps {
+export interface Article {
   url: string;
   id: number;
   author: Author;
+  category: Category | null;
+  tags: string[];
+  avatar: Avatar | null;
   title: string;
   created: string;
   updated: string;
-  category?: Category;
-  tags?: string[];
-  avatar?: Avatar;
+}
+
+export interface ArticleListProps {
+  count: number;
+  next: string;
+  previous: string | null;
+  results: Article[];
 }
 
 export interface ArticleDetailProps {
   url: string;
   id: number;
   author: Author;
+  category: Category | null;
+  tags: string[];
+  avatar: Avatar | null;
   body_html: string;
   toc_html: string;
   title: string;
   body: string;
   created: string;
   updated: string;
-  category?: Category;
-  tags?: string[];
-  avatar?: Avatar;
 }
 
 export interface GlobalDataProps {
-  articleList: ArticleListProps[];
+  articleList: ArticleListProps;
   article: ArticleDetailProps;
   user: UserProps
 }
 
 const store = createStore<GlobalDataProps>({
   state: {
-    articleList: [],
+    articleList: {} as ArticleListProps,
     article: {} as ArticleDetailProps,
     user: {
       id: 1,
@@ -85,8 +92,9 @@ const store = createStore<GlobalDataProps>({
     }
   },
   actions: {
-    async fetchArticleList({ commit }) {
-      const { data } = await axios.get('/api/article/')
+    async fetchArticleList({ commit }, page?: string) {
+      const { data } = page ? await axios.get(`/api/article/?page=${page}`)
+        : await axios.get('/api/article/')
       commit('fetchArticleList', data)
     },
     async fetchArticleDetail({ commit }, id) {
